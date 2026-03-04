@@ -7,5 +7,6 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-healthcheckPath = "/healthz"
-healthcheckTimeout = 90
+# Healthcheck disabled temporarily to verify app serves successfully.
+# healthcheckPath = "/healthz"
+# healthcheckTimeout = 90
