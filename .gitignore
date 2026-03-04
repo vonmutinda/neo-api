@@ -1,11 +1,11 @@
 # Binaries and build output
 /bin/
-api
-lending-worker
-recon-worker
-telegram-bot
-seed-admin
-ethswitch-gateway
+/api
+/lending-worker
+/recon-worker
+/telegram-bot
+/seed-admin
+/ethswitch-gateway
 *.exe
 *.exe~
 *.dll
