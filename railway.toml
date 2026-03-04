@@ -1,9 +1,10 @@
 # Railway config for the Neobank API service.
 # Build and deploy settings; env vars are set in the Railway dashboard.
+# Uses root Dockerfile so build context is repo root (required for COPY . . and cmd/).
 
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "deploy/Dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 healthcheckPath = "/healthz"
