@@ -39,15 +39,22 @@ Set these in your Railway project (or equivalent):
 
 ## Migrations
 
-The API **does not** run migrations on startup. Run them before or when deploying:
+The API **does not** run migrations on startup. Run them before or when deploying.
 
-1. **Release / pre-deploy command** (if your platform supports it), e.g.:
-   ```bash
-   migrate -path migrations -database "$NEO_DATABASE_URL" up
-   ```
-   (Requires the [golang-migrate](https://github.com/golang-migrate/migrate) CLI and `NEO_DATABASE_URL` in the environment.)
+### Railway (automatic)
 
-2. **One-off job** — run the same command once against the production DB from a job or your machine (with appropriate access).
+On **Railway**, migrations run automatically in the **pre-deploy** phase before each deployment. The root [Dockerfile](../Dockerfile) includes the [golang-migrate](https://github.com/golang-migrate/migrate) CLI and the `migrations/` directory; [railway.toml](../railway.toml) sets the pre-deploy command:
+
+```bash
+migrate -path /migrations -database "$NEO_DATABASE_URL" up
+```
+
+Ensure **neo-api** has `NEO_DATABASE_URL` set (e.g. via `${{Postgres.DATABASE_URL}}`). If the pre-deploy command fails (e.g. DB unreachable or migration error), Railway aborts the deployment and the previous version keeps running.
+
+### Other platforms / local
+
+1. **Pre-deploy or release command** (if your platform supports it): run the same command as above (path may be `migrations` when run from repo root).
+2. **One-off job** — run once against the production DB from a job or your machine (with appropriate access).
 
 ## Railway multi-service setup
 
@@ -111,18 +118,13 @@ Railway lets you reference other services with `${{ServiceName.VARIABLE}}`. Use 
 
 ### After deploy: migrations
 
-Run DB migrations against the **state** Postgres (the one backing the API), not Formance Postgres. Use a one-off run or a release command, for example:
-
-```bash
-migrate -path migrations -database "$NEO_DATABASE_URL" up
-```
-
-See **Migrations** above for options.
+On Railway, migrations run automatically before each deploy (see **Migrations** above). For other setups, run DB migrations against the **state** Postgres (the one backing the API), not Formance Postgres—e.g. one-off or release command: `migrate -path migrations -database "$NEO_DATABASE_URL" up`.
 
 ## Railway build settings (API only)
 
-- **Build**: Repo root is the context. The root **railway.toml** sets Dockerfile path to **`deploy/Dockerfile`**. In the API service settings, set **Docker build target** to **`api`**.
-- **Health check**: `railway.toml` sets **healthcheckPath** to **`/healthz`**. The image also defines a Docker HEALTHCHECK using `PORT`.
+- **Build**: Repo root is the context. The root **railway.toml** sets Dockerfile path to **`Dockerfile`** (root). The **api** stage includes the API binary, the migrate CLI, and **/migrations** for the pre-deploy command.
+- **Pre-deploy**: `railway.toml` sets **preDeployCommand** to run migrations before the API starts; requires `NEO_DATABASE_URL`.
+- **Health check**: `railway.toml` can set **healthcheckPath** to **`/healthz`** when enabled.
 
 ## Local stack (docker-compose)
 

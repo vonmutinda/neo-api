@@ -7,6 +7,8 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+# Run DB migrations before starting the API (requires migrate CLI and /migrations in image).
+preDeployCommand = "migrate -path /migrations -database \"$NEO_DATABASE_URL\" up"
 # Healthcheck disabled temporarily to verify app serves successfully.
 # healthcheckPath = "/healthz"
 # healthcheckTimeout = 90

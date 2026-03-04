@@ -19,6 +19,9 @@ COPY . .
 # Only build the API binary for Railway (deploy/Dockerfile builds all for local compose).
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /bin/neo-api ./cmd/api
 
+# Install migrate CLI for pre-deploy migrations on Railway.
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
+
 # ============================================
 # Stage 2: Runtime images (one per binary)
 # ============================================
@@ -31,6 +34,8 @@ USER neobank
 # --- API Server (final stage for Railway; they build the last stage) ---
 FROM base AS api
 COPY --from=builder /bin/neo-api /usr/local/bin/neo-api
+COPY --from=builder /go/bin/migrate /usr/local/bin/migrate
+COPY --from=builder /src/migrations /migrations
 EXPOSE 8080
 # Healthcheck disabled temporarily to verify app serves successfully.
 # HEALTHCHECK --interval=15s --timeout=3s --start-period=10s --retries=3 \
