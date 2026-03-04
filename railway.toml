@@ -8,4 +8,4 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 healthcheckPath = "/healthz"
-healthcheckTimeout = 60
+healthcheckTimeout = 90
