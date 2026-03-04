@@ -8,7 +8,8 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 # Run DB migrations before starting the API (requires migrate CLI and /migrations in image).
-preDeployCommand = "migrate -path /migrations -database \"$NEO_DATABASE_URL\" up"
+# Use NEO_DATABASE_URL if set and has a scheme; else build from NEO_DATABASE_* so pre-deploy works when URL ref isn't expanded.
+preDeployCommand = "/bin/sh -c 'if [ -n \"$NEO_DATABASE_URL\" ] && [ \"${NEO_DATABASE_URL#*://}\" != \"$NEO_DATABASE_URL\" ]; then migrate -path /migrations -database \"$NEO_DATABASE_URL\" up; else migrate -path /migrations -database \"postgres://${NEO_DATABASE_USERNAME}:${NEO_DATABASE_PASSWORD}@${NEO_DATABASE_HOST}:${NEO_DATABASE_PORT}/${NEO_DATABASE_DATABASE}?sslmode=disable\" up; fi'"
 # Healthcheck disabled temporarily to verify app serves successfully.
 # healthcheckPath = "/healthz"
 # healthcheckTimeout = 90

@@ -49,7 +49,7 @@ On **Railway**, migrations run automatically in the **pre-deploy** phase before 
 migrate -path /migrations -database "$NEO_DATABASE_URL" up
 ```
 
-Ensure **neo-api** has `NEO_DATABASE_URL` set (e.g. via `${{Postgres.DATABASE_URL}}`). If the pre-deploy command fails (e.g. DB unreachable or migration error), Railway aborts the deployment and the previous version keeps running.
+Ensure **neo-api** has either `NEO_DATABASE_URL` set (e.g. via `${{Postgres.DATABASE_URL}}`) or all of `NEO_DATABASE_HOST`, `NEO_DATABASE_PORT`, `NEO_DATABASE_USERNAME`, `NEO_DATABASE_PASSWORD`, `NEO_DATABASE_DATABASE`—the pre-deploy command uses the URL if present and valid, otherwise builds it from those variables (so migrations work even when the URL reference is not expanded in the pre-deploy phase). If the pre-deploy command fails (e.g. DB unreachable or migration error), Railway aborts the deployment and the previous version keeps running.
 
 ### Other platforms / local
 
