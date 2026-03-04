@@ -211,16 +211,18 @@ func newDeps(ctx context.Context, cfg *config.API, db *repository.DB, log *slog.
 	adminCardSvc := admin.NewCardService(adminQueryRepo, cardRepo, auditRepo)
 	reconSvc := admin.NewReconService(adminQueryRepo, auditRepo)
 	geoPath := os.Getenv("GEOIP_DB_PATH")
-	if geoPath == "" {
-		return nil, fmt.Errorf("GEOIP_DB_PATH is required (path to MaxMind GeoLite2-City.mmdb)")
+	var geoReader *geo.Reader
+	if geoPath != "" {
+		var err error
+		geoReader, err = geo.NewReader(geoPath)
+		if err != nil {
+			return nil, fmt.Errorf("GEOIP_DB_PATH: %w", err)
+		}
+		if geoReader != nil {
+			log.Info("GeoIP database loaded for money-flow map", slog.String("path", geoPath))
+		}
 	}
-	geoReader, err := geo.NewReader(geoPath)
-	if err != nil {
-		return nil, fmt.Errorf("GEOIP_DB_PATH: %w", err)
-	}
-	if geoReader != nil {
-		log.Info("GeoIP database loaded for money-flow map", slog.String("path", geoPath))
-	}
+	// When geoPath is empty, geoReader is nil; NewAnalyticsService uses NoopLookuper in that case.
 	analyticsSvc := admin.NewAnalyticsService(adminQueryRepo, flagRepo, geoReader)
 	flagSvc := admin.NewFlagService(flagRepo, auditRepo)
 	configSvc := admin.NewConfigService(configRepo, auditRepo)
