@@ -1,0 +1,19 @@
+vars {
+    monetary $from_amount
+    monetary $to_amount
+    account $user_account
+    account $fx_account
+}
+
+send $from_amount (
+    source = $user_account
+    destination = $fx_account
+)
+
+send $to_amount (
+    source = {
+        $fx_account
+        @world
+    }
+    destination = $user_account
+)

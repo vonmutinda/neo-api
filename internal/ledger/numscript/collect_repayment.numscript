@@ -1,0 +1,15 @@
+vars {
+    monetary $principal
+    monetary $fee
+    account $source
+}
+
+send $principal (
+    source = $source
+    destination = @{{ .LoanCapitalAccount }}
+)
+
+send $fee (
+    source = $source
+    destination = @{{ .InterestAccount }}
+)

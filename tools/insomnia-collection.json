@@ -1,0 +1,435 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-02-18T00:00:00.000Z",
+  "__export_source": "insomnia.desktop",
+  "resources": [
+    {
+      "_id": "wrk_neo",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "Neo Neobank API",
+      "description": "Ethiopian Neobank backend API — all endpoints with dev-mode auth (Bearer = user UUID)."
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_neo",
+      "name": "Local Dev",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "user1_id": "88f86f32-4408-4477-b26b-7cc43b2e0878",
+        "user2_id": "d42be3f8-a1ad-4a06-b35c-9ba179646971",
+        "user1_phone": "+251911223344",
+        "user2_phone": "+251922334455",
+        "new_phone": "+251933445566",
+        "card_id": "REPLACE_WITH_CARD_UUID",
+        "loan_id": "REPLACE_WITH_LOAN_UUID"
+      }
+    },
+
+    {
+      "_id": "fld_health",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "Health",
+      "description": "Liveness and readiness probes"
+    },
+    {
+      "_id": "req_healthz",
+      "_type": "request",
+      "parentId": "fld_health",
+      "name": "Healthz",
+      "method": "GET",
+      "url": "{{ _.base_url }}/healthz",
+      "headers": [
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_readyz",
+      "_type": "request",
+      "parentId": "fld_health",
+      "name": "Readyz",
+      "method": "GET",
+      "url": "{{ _.base_url }}/readyz",
+      "headers": [
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "fld_onboarding",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "Onboarding",
+      "description": "User registration"
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "fld_onboarding",
+      "name": "Register New User",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/register",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"phoneNumber\": \"{{ _.new_phone }}\"\n}"
+      },
+      "parameters": []
+    },
+
+    {
+      "_id": "fld_kyc",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "KYC",
+      "description": "Fayda eKYC OTP and verification"
+    },
+    {
+      "_id": "req_kyc_otp",
+      "_type": "request",
+      "parentId": "fld_kyc",
+      "name": "Request KYC OTP",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/kyc/otp",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"faydaFin\": \"123456789012\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_kyc_verify",
+      "_type": "request",
+      "parentId": "fld_kyc",
+      "name": "Verify KYC OTP",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/kyc/verify",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"faydaFin\": \"123456789012\",\n  \"otp\": \"123456\",\n  \"transactionId\": \"REPLACE_WITH_TX_ID\"\n}"
+      },
+      "parameters": []
+    },
+
+    {
+      "_id": "fld_wallets",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "Wallets",
+      "description": "Balance, summary, and transaction history"
+    },
+    {
+      "_id": "req_wallet_summary",
+      "_type": "request",
+      "parentId": "fld_wallets",
+      "name": "Wallet Summary (Wise-style)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/wallets/summary",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_balance_etb",
+      "_type": "request",
+      "parentId": "fld_wallets",
+      "name": "Balance — ETB",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/wallets/balance",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": [
+        { "name": "currency", "value": "ETB" }
+      ]
+    },
+    {
+      "_id": "req_balance_usd",
+      "_type": "request",
+      "parentId": "fld_wallets",
+      "name": "Balance — USD",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/wallets/balance",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": [
+        { "name": "currency", "value": "USD" }
+      ]
+    },
+    {
+      "_id": "req_transactions_all",
+      "_type": "request",
+      "parentId": "fld_wallets",
+      "name": "Transactions — All",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/wallets/transactions",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_transactions_etb",
+      "_type": "request",
+      "parentId": "fld_wallets",
+      "name": "Transactions — ETB only",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/wallets/transactions",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": [
+        { "name": "currency", "value": "ETB" }
+      ]
+    },
+
+    {
+      "_id": "fld_transfers",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "Transfers",
+      "description": "Inbound P2P and outbound EthSwitch transfers"
+    },
+    {
+      "_id": "req_transfer_inbound",
+      "_type": "request",
+      "parentId": "fld_transfers",
+      "name": "P2P Inbound Transfer",
+      "description": "Send money to another Neo user (instant, zero fee)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/transfers/inbound",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"recipientPhone\": \"{{ _.user2_phone }}\",\n  \"amountCents\": 100000,\n  \"currency\": \"ETB\",\n  \"narration\": \"Lunch money\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_transfer_outbound",
+      "_type": "request",
+      "parentId": "fld_transfers",
+      "name": "Outbound EthSwitch Transfer",
+      "description": "Send money to an external bank via EthSwitch",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/transfers/outbound",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amountCents\": 50000,\n  \"currency\": \"ETB\",\n  \"destPhone\": \"+251900000000\",\n  \"destInstitution\": \"CBE\",\n  \"narration\": \"Rent payment\"\n}"
+      },
+      "parameters": []
+    },
+
+    {
+      "_id": "fld_loans",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "Loans",
+      "description": "Eligibility, history, application, and detail"
+    },
+    {
+      "_id": "req_loan_eligibility",
+      "_type": "request",
+      "parentId": "fld_loans",
+      "name": "Loan Eligibility",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/loans/eligibility",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_loan_list",
+      "_type": "request",
+      "parentId": "fld_loans",
+      "name": "Loan History",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/loans",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": [
+        { "name": "limit", "value": "10" },
+        { "name": "offset", "value": "0" }
+      ]
+    },
+    {
+      "_id": "req_loan_apply",
+      "_type": "request",
+      "parentId": "fld_loans",
+      "name": "Apply for Loan",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/loans/apply",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"principalCents\": 500000,\n  \"durationDays\": 30\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_loan_detail",
+      "_type": "request",
+      "parentId": "fld_loans",
+      "name": "Loan Detail",
+      "description": "Replace loan_id env var with a real UUID after applying",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/loans/{{ _.loan_id }}",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+
+    {
+      "_id": "fld_cards",
+      "_type": "request_group",
+      "parentId": "wrk_neo",
+      "name": "Cards",
+      "description": "List, detail, status, limits, and channel toggles"
+    },
+    {
+      "_id": "req_cards_list",
+      "_type": "request",
+      "parentId": "fld_cards",
+      "name": "List Cards",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/cards",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_cards_detail",
+      "_type": "request",
+      "parentId": "fld_cards",
+      "name": "Card Detail",
+      "description": "Replace card_id env var with a real UUID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/cards/{{ _.card_id }}",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {},
+      "parameters": []
+    },
+    {
+      "_id": "req_cards_status",
+      "_type": "request",
+      "parentId": "fld_cards",
+      "name": "Freeze / Unfreeze Card",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/v1/cards/{{ _.card_id }}/status",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"frozen\"\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_cards_limits",
+      "_type": "request",
+      "parentId": "fld_cards",
+      "name": "Update Spending Limits",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/v1/cards/{{ _.card_id }}/limits",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"perTxnLimitCents\": 1000000,\n  \"dailyLimitCents\": 5000000,\n  \"monthlyLimitCents\": 20000000\n}"
+      },
+      "parameters": []
+    },
+    {
+      "_id": "req_cards_toggles",
+      "_type": "request",
+      "parentId": "fld_cards",
+      "name": "Update Channel Toggles",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/v1/cards/{{ _.card_id }}/toggles",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Authorization", "value": "Bearer {{ _.user1_id }}" },
+        { "name": "Idempotency-Key", "value": "{% uuid 'v4' %}" },
+        { "name": "X-Request-Id", "value": "{% uuid 'v4' %}" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"allowOnline\": false,\n  \"allowContactless\": true,\n  \"allowAtm\": true,\n  \"allowInternational\": false\n}"
+      },
+      "parameters": []
+    }
+  ]
+}

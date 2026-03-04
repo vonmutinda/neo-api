@@ -1,0 +1,13 @@
+vars {
+  account $hold
+}
+
+send [{{ .Asset }} *] (
+  source = $hold
+  destination = {
+    {{- range $p := .Postings }}
+    max [{{ $p.Asset }} {{ $p.Amount }}] to @{{ $p.Source }}
+    {{- end }}
+    remaining kept
+  }
+)

@@ -1,0 +1,10 @@
+# Railway config for the Neobank API service.
+# Build and deploy settings; env vars are set in the Railway dashboard.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "deploy/Dockerfile"
+
+[deploy]
+healthcheckPath = "/healthz"
+healthcheckTimeout = 30

@@ -1,0 +1,9 @@
+vars {
+    monetary $amount
+    account $destination
+}
+
+send $amount (
+    source = @{{ .LoanCapitalAccount }}
+    destination = $destination
+)

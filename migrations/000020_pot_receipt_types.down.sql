@@ -1,0 +1,2 @@
+-- PostgreSQL does not support removing enum values; leave pot_deposit and pot_withdraw in receipt_type.
+-- No-op.

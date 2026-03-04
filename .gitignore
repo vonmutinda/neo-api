@@ -1,0 +1,58 @@
+# Binaries and build output
+/bin/
+api
+lending-worker
+recon-worker
+telegram-bot
+seed-admin
+ethswitch-gateway
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go workspace and module
+vendor/
+
+# Test and coverage
+*.test
+*.out
+coverage.html
+coverage.txt
+*.prof
+
+# Environment and secrets (keep .env.example)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE and editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs (not ready yet)
+/docs/
+
+# Large/binary data
+*.mmdb
+GeoLite2-*
+
+# Logs and temp
+*.log
+/tmp/
+/temp/
+.cache/
+
+# Deploy / local overrides (uncomment if you want to ignore)
+# deploy/*.local
+# deploy/.env*
